@@ -77,8 +77,8 @@ class Actor(Neuron):
 class LatitudeReceptor(Receptor):
     def __init__(self, gene: Gene, organism):
         super().__init__(gene, organism)
-        self.name = 'Latitude'
-        self.color = NEURON_COLORS[0]
+        self.name = 'latitude'
+        self.color = COLOR_DICT[self.name]
         
     def sense(self, world: World):
         y_location = self.organism.loc[0]
@@ -87,12 +87,84 @@ class LatitudeReceptor(Receptor):
 class LongitudeReceptor(Receptor):
     def __init__(self, gene: Gene, organism):
         super().__init__(gene, organism)
-        self.name = 'Longitude'
-        self.color = NEURON_COLORS[1]
+        self.name = 'longitude'
+        self.color = COLOR_DICT[self.name]
         
     def sense(self, world: World):
         x_location = self.organism.loc[1]
         self.activation_value += x_location / len(world.grid[0])
+        
+class SouthBlockedReceptor(Receptor):
+    def __init__(self, gene: Gene, organism, distance = 1):
+        super().__init__(gene, organism)
+        self.name = 'south_blocked'
+        self.color = COLOR_DICT[self.name]
+        self.distance = distance
+        self.max_distance = sum([1/(d+1) for d in range(distance)])
+        
+    def sense(self, world: World):
+        blocks = [0] * self.distance
+        for distance in range(self.distance):
+            loc = (self.organism.loc[0] + 1 + distance, self.organism.loc[1])
+            if world.is_in_bounds(loc):
+                blocks[distance] = 1/(distance + 1)
+            elif world.is_occupied(loc):
+                blocks[distance] = 1/(distance+1)
+        self.activation_value += sum(blocks) / self.max_distance
+
+class NorthBlockedReceptor(Receptor):
+    def __init__(self, gene: Gene, organism, distance = 1):
+        super().__init__(gene, organism)
+        self.name = 'north_blocked'
+        self.color = COLOR_DICT[self.name]
+        self.distance = distance
+        self.max_distance = sum([1/(d+1) for d in range(distance)])
+        
+    def sense(self, world: World):
+        blocks = [0] * self.distance
+        for distance in range(1, self.distance):
+            loc = (self.organism.loc[0] - 1 - distance, self.organism.loc[1])
+            if world.is_in_bounds(loc):
+                blocks[distance] = 1/(distance + 1)
+            elif world.is_occupied(loc):
+                blocks[distance] = 1/(distance+1)
+        self.activation_value += sum(blocks) / self.max_distance
+        
+class WestBlockedReceptor(Receptor):
+    def __init__(self, gene: Gene, organism, distance = 1):
+        super().__init__(gene, organism)
+        self.name = 'east_blocked'
+        self.color = COLOR_DICT[self.name]
+        self.distance = distance
+        self.max_distance = sum([1/(d+1) for d in range(distance)])
+        
+    def sense(self, world: World):
+        blocks = [0] * self.distance
+        for distance in range(1, self.distance):
+            loc = (self.organism.loc[0], self.organism.loc[1] - 1 - distance)
+            if world.is_in_bounds(loc):
+                blocks[distance] = 1/(distance + 1)
+            elif world.is_occupied(loc):
+                blocks[distance] = 1/(distance+1)
+        self.activation_value += sum(blocks) / self.max_distance
+        
+class EastBlockedReceptor(Receptor):
+    def __init__(self, gene: Gene, organism, distance = 1):
+        super().__init__(gene, organism)
+        self.name = 'south_blocked'
+        self.color = COLOR_DICT[self.name]
+        self.distance = distance
+        self.max_distance = sum([1/(d+1) for d in range(distance)])
+        
+    def sense(self, world: World):
+        blocks = [0] * self.distance
+        for distance in range(1, self.distance):
+            loc = (self.organism.loc[0], self.organism.loc[1] + 1 + distance)
+            if world.is_in_bounds(loc):
+                blocks[distance] = 1/(distance + 1)
+            elif world.is_occupied(loc):
+                blocks[distance] = 1/(distance+1)
+        self.activation_value += sum(blocks) / self.max_distance
     
 class Internal(Receptor):
     def __init__(self, gene: Gene, organism):
@@ -105,6 +177,10 @@ class Internal(Receptor):
 receptor_dict = {
     'latitude': LatitudeReceptor,
     'longitude': LongitudeReceptor,
+    'north_blocked': NorthBlockedReceptor,
+    'south_blocked': SouthBlockedReceptor,
+    'east_blocked': EastBlockedReceptor,
+    'west_blocked': WestBlockedReceptor,
     'internal': Internal
 }
 

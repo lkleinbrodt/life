@@ -1,9 +1,12 @@
 import pickle
+import json
 from config import *
 from world import World
 import random
 from gene import create_genome
 from organism import Organism
+
+
 
 class Population:
     def __init__(self, world: World, n_organisms: int, selector):
@@ -14,6 +17,10 @@ class Population:
         self.world = world
         self.generation_data = {}
         self.selector = selector
+        self.uid = random.getrandbits(48)
+        self.directory = DATA_DIR+'/'+str(self.uid)
+        
+        os.mkdir(self.directory)
         
         
         for _ in range(n_organisms):
@@ -74,7 +81,7 @@ class Population:
             self.step_count = 0
             self.generation_count += 1
             self.generation_data[str(self.generation_count)] = self.snapshot()
-            self.save_generation_data()
+            # self.save_generation_data()
         else:
             self.step_count += 1
     
@@ -96,12 +103,16 @@ class Population:
         return out
     
     def save_generation_data(self):
-        import json
-        with open(DATA_DIR+'/generation_data.json', 'w') as f:
+        
+        with open(self.directory+'/generation_data.json', 'w') as f:
             json.dump(self.generation_data, f)
     
     def save(self):
-        with open(DATA_DIR+'/population.pkl', 'wb') as f:
+        with open(self.directory+'/population.pkl', 'wb') as f:
             pickle.dump(self, f)
         
 
+def load_population(path):
+    with open(path, 'rb') as f:
+        out = pickle.load(f)
+    return out

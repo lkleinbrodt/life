@@ -2,17 +2,33 @@ import colorsys
 import numpy as np
 import os
 
-CONNECTION_MAGNITUDE = 4.0
-GENOME_SIZE = 8
-N_INTERNAL_NEURONS = 3
-MUTATION_RATE = .001
+GENOME_SIZE = 24
+N_INTERNAL_NEURONS = 6
+MUTATION_RATE = .01
 MUTATION_MAGNITUDE = .5
 GENERATION_LENGTH = 50
-POPULATION_SIZE = 500
+POPULATION_SIZE = 750
+CONNECTION_MAGNITUDE = 4.0
+
+def get_configs():
+    out = {
+        'CONNECTION_MAGNITUDE': CONNECTION_MAGNITUDE,
+        'GENOME_SIZE': GENOME_SIZE,
+        'N_INTERNAL_NEURONS': N_INTERNAL_NEURONS,
+        'MUTATION_RATE': MUTATION_RATE,
+        'MUTATION_MAGNITUDE': MUTATION_MAGNITUDE,
+        'GENERATION_LENGTH': GENERATION_LENGTH,
+        'POPULATION_SIZE': POPULATION_SIZE,
+    }
+    return out
 
 AVAILABLE_RECEPTORS = [
     'latitude',
     'longitude',
+    'north_blocked',
+    'south_blocked',
+    'east_blocked',
+    'west_blocked',
 ]
 
 AVAILABLE_ACTORS = [
@@ -34,6 +50,11 @@ def generate_uniform_colors(n):
     return colors
 
 NEURON_COLORS = generate_uniform_colors(len(AVAILABLE_RECEPTORS) + len(AVAILABLE_ACTORS) + 1)
+
+COLOR_DICT = {
+    neuron: NEURON_COLORS[i]
+    for i, neuron in enumerate(AVAILABLE_ACTORS + AVAILABLE_RECEPTORS + ['internal'])
+}
 
 
 script_dir = os.path.abspath(os.path.dirname(__file__))

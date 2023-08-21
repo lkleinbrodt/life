@@ -7,6 +7,13 @@ class World:
         self.n_rows = size
         self.n_columns = size
         
+    def is_in_bounds(self, loc):
+        valid_y = (loc[0] <= self.n_rows) & (loc[0] >= 0)
+        valid_x = (loc[1] <= self.n_columns) & (loc[0] >= 0)
+        
+        return valid_y & valid_x
+        
+        
     def is_occupied(self, loc):
         y = loc[0]
         x = loc[1]

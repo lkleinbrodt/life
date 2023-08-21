@@ -1,7 +1,7 @@
 class BoxSelector:
     def __init__(self, x1, y1, x2, y2, world = None):
                  
-        assert all([x > 0 for x in [x1, x2, y1, y2]])
+        assert all([x >= 0 for x in [x1, x2, y1, y2]])
               
         #TODO: support percent inputs
         if all([x <= 1.0 for x in [x1, x2, y1, y2]]):
