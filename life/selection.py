@@ -1,4 +1,6 @@
 #TODO: parent class
+from config import MORTALITY_RATE #TODO: use in params
+import random
 
 class BoxSelector:
     def __init__(self, x1, y1, x2, y2, n_columns=None, n_rows = None):
@@ -47,11 +49,13 @@ class DiseaseSelector:
                 
         for i, organism in enumerate(population.population):
             if organism.is_diseased:
-                population.world.clear_loc(organism.loc)
-                del population.population[i]
-                n_dead += 1
-            if organism.is_diseased:
                 n_infected += 1
+                if random.random() <= MORTALITY_RATE:
+                    population.world.clear_loc(organism.loc)
+                    del population.population[i]
+                    n_dead += 1
+
+                
         out = {
             '# Died': n_dead,
             '# Diseased': n_infected
