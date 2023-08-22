@@ -1,15 +1,18 @@
+#TODO: parent class
+
 class BoxSelector:
-    def __init__(self, x1, y1, x2, y2, world = None):
+    def __init__(self, x1, y1, x2, y2, n_columns=None, n_rows = None):
                  
         assert all([x >= 0 for x in [x1, x2, y1, y2]])
               
         #TODO: support percent inputs
         if all([x <= 1.0 for x in [x1, x2, y1, y2]]):
+            assert (n_columns is not None) & (n_rows is not None)
             
-            x1 = int(x1*world.n_columns)
-            x2 = int(x2*world.n_columns)
-            y1 =  int(y1*world.n_rows)
-            y2 = int(y2*world.n_rows)
+            x1 = int(x1*n_columns)
+            x2 = int(x2*n_columns)
+            y1 =  int(y1*n_rows)
+            y2 = int(y2*n_rows)
         
         self.x1 = x1
         self.x2 = x2
@@ -31,3 +34,31 @@ class BoxSelector:
             '# Died': n_dead
         }
         return n_dead
+    
+class DiseaseSelector:
+    def __init__(self):
+        #TODO: control infection rate ehre
+        pass
+    
+    from population import Population
+    def select(self, population: Population):
+        n_dead = 0
+        n_infected = 0
+                
+        for i, organism in enumerate(population.population):
+            if organism.is_diseased:
+                population.world.clear_loc(organism.loc)
+                del population.population[i]
+                n_dead += 1
+            if organism.is_diseased:
+                n_infected += 1
+        out = {
+            '# Died': n_dead,
+            '# Diseased': n_infected
+        }
+        return out
+
+SELECTOR_MAP = {
+    'box': BoxSelector,
+    'disease': DiseaseSelector
+}

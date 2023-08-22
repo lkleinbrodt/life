@@ -1,8 +1,7 @@
 import pygame
 import copy
 import sys
-from world import World
-from population import Population, load_population
+from simulation import Simulation
 from config import *
 
 WIDTH, HEIGHT = 800, 800
@@ -107,9 +106,9 @@ def main():
     #input screen
 
 
-def gameplay(screen, world: World, population: Population):
+def gameplay(screen, simulation: Simulation):
     font = pygame.font.Font(None, 36)
-    ARRAY_SIZE = world.size
+    ARRAY_SIZE = simulation.world.size
     CELL_SIZE = WIDTH // ARRAY_SIZE
     
     running = True
@@ -155,12 +154,7 @@ def gameplay(screen, world: World, population: Population):
                     print('Captured Shape:', captured_shape)
 
         if not paused:
-            population.step(world)
-            if (i % (GENERATION_LENGTH * 10)) == 0:
-                # prev_gen = population.generation_count
-                print('Generation:', population.generation_count)
-                population.save()
-                population.save_generation_data()
+            simulation.step()
         # print(f'Step {iterations}')
         # print(population.get_organism(5))
 
@@ -168,9 +162,9 @@ def gameplay(screen, world: World, population: Population):
         screen.fill((0, 0, 0))
 
         # Draw the array
-        for i in range(world.n_rows):
-            for j in range(world.n_columns):
-                grid_item = world.grid[i][j]
+        for i in range(simulation.world.n_rows):
+            for j in range(simulation.world.n_columns):
+                grid_item = simulation.world.grid[i][j]
                 if grid_item is None:
                     color = (0, 0, 0)
                 else:
@@ -182,8 +176,8 @@ def gameplay(screen, world: World, population: Population):
         
         # n_organisms = len(population.population)
         render_wrapped_text(screen, "Press 'p' to pause/unpause", font, white, pygame.Rect(WIDTH, 100, 20, HEIGHT - 100))
-        render_wrapped_text(screen, f"Generation: {population.generation_count}", font, white, pygame.Rect(WIDTH, 100, 20, 20))
-        render_wrapped_text(screen, f"Information: \n{population.generation_data.get('selection_data', '')}", font, white, pygame.Rect(WIDTH, 100, 20, HEIGHT), max_lines=5)
+        render_wrapped_text(screen, f"Generation: {simulation.population.generation_count}", font, white, pygame.Rect(WIDTH, 100, 20, 20))
+        render_wrapped_text(screen, f"Information: \n{simulation.population.generation_data.get('selection_data', '')}", font, white, pygame.Rect(WIDTH, 100, 20, HEIGHT), max_lines=5)
         
         pygame.display.flip()
         clock.tick(clock_speed)  # Limit the frame rate

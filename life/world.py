@@ -8,22 +8,23 @@ class World:
         self.n_columns = size
         
     def is_in_bounds(self, loc):
-        valid_y = (loc[0] <= self.n_rows) & (loc[0] >= 0)
-        valid_x = (loc[1] <= self.n_columns) & (loc[0] >= 0)
+        valid_y = (loc[0] <= (self.n_rows-1)) & (loc[0] >= 0)
+        valid_x = (loc[1] <= (self.n_columns-1)) & (loc[0] >= 0)
         
         return valid_y & valid_x
         
-        
+    def get_loc(self, loc):
+        if self.is_in_bounds(loc):
+            try:
+                return self.grid[loc[0]][loc[1]]
+            except IndexError:
+                print((loc[0], loc[1]))
+                raise IndexError()
+        else:
+            return None
+    
     def is_occupied(self, loc):
-        y = loc[0]
-        x = loc[1]
-        try:
-            return self.grid[y][x] is not None
-        except IndexError as e:
-            print(x, y)
-            print(len(self.grid))
-            print(len(self.grid[0]))
-            raise e
+        return self.get_loc(loc) is not None
 
     def set_loc(self, loc, object):
         if self.is_occupied(loc):

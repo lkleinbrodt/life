@@ -1,4 +1,4 @@
-from config import *
+
 from world import World
 from math import tanh
 from typing import Any, List
@@ -11,7 +11,7 @@ class Brain:
         self.receptors = []
         self.internals = {
             f'internal_{i}': neuron.Internal(None, organism) 
-            for i in range(N_INTERNAL_NEURONS)
+            for i in range(organism.params.n_internal_neurons)
         }
         self.actors = {
             name: actor(organism) for 

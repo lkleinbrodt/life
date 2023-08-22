@@ -1,5 +1,5 @@
 
-from config import *
+from config import COLOR_DICT, AVAILABLE_ACTORS, AVAILABLE_RECEPTORS, NEURON_COLORS
 from world import World
 from math import tanh
 from gene import Gene
