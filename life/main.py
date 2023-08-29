@@ -36,7 +36,6 @@ if __name__ == '__main__':
         )
         
         sim = simulation.Simulation(params)
-        app.parameters
         
         print(sim.population.directory)
         pygame.init()

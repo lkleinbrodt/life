@@ -20,16 +20,16 @@ class Organism:
         self.brain = Brain(genome = genome, organism = self)
         self.brain.connect()
         
-        # import numpy as np
-        # self.color = np.array([1, 1, 1], dtype=float)
-        # for neuron in self.brain.receptors + list(self.brain.internals.values()):
-        #     if neuron.weight is not None:
-        #         self.color += (neuron.color * neuron.weight)
+        import numpy as np
+        self.color = np.array([1, 1, 1], dtype=float)
+        for neuron in self.brain.receptors + list(self.brain.internals.values()):
+            if neuron.weight is not None:
+                self.color += (neuron.color * neuron.weight)
         
-        # self.color += abs(self.color.min())
-        # self.color /= self.color.sum()
-        # self.color *= 255
-        self.color = (0, 150, 255)
+        self.color += abs(self.color.min())
+        self.color /= self.color.sum()
+        self.color *= 255
+        # self.color = (0, 150, 255) #plain blue
         
         
     
@@ -51,7 +51,8 @@ class Organism:
             self.is_diseased = True
             self.infection_timer = self.infection_step
             # self.disease_timer = self.mortality_step
-            self.color = (238, 75, 43)
+            # self.color = (238, 75, 43) #plain red
+            self.color = (255, 255, 255)
     
     def infect(self, world: World):
         self.infection_timer -= 1
