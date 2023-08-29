@@ -48,7 +48,7 @@ class Population:
             organism.move(location)
             
     def selection(self, selector):
-        self.prev_n_dead = selector.select(self)
+        self.selection_output = selector.select(self)
         
     
     def reproduce(self):
@@ -103,7 +103,7 @@ class Population:
     def snapshot(self):
         out = {
             'n_alive': len(self.population),
-            'prev_n_died': self.prev_n_dead
+            'previous selection': self.selection_output
         }
         return out
     

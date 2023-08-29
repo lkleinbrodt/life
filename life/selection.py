@@ -35,7 +35,7 @@ class BoxSelector:
         out = {
             '# Died': n_dead
         }
-        return n_dead
+        return out
     
 class DiseaseSelector:
     def __init__(self):

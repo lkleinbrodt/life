@@ -18,7 +18,8 @@ class ParameterEditor:
             "generation_length": tk.IntVar(value=GENERATION_LENGTH),
             "population_size": tk.IntVar(value=POPULATION_SIZE),
             "infection_step": tk.DoubleVar(value = INFECTION_STEP),
-            "infection_rate": tk.DoubleVar(value = INFECTION_RATE)
+            "infection_rate": tk.DoubleVar(value = INFECTION_RATE),
+            "mortality_rate": tk.DoubleVar(value = MORTALITY_RATE)
         }
         
         self.create_widgets()

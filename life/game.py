@@ -11,22 +11,13 @@ black = (0, 0, 0)
 white = (255, 255, 255)
 update_button_color = (0, 255, 0)
 
-def render_wrapped_text(screen, text, font, color, rect, max_lines=None):
-    lines = text.split('\n')
-    rendered_lines = []
+### A function for pygame that renders text and wraps it to fit within a rectangle
 
-    for line in lines:
-        if max_lines is None or len(rendered_lines) < max_lines:
-            rendered_text = font.render(line, True, color)
-            rendered_lines.append(rendered_text)
 
-    total_height = sum(text.get_height() for text in rendered_lines)
-    y_offset = rect.centery - total_height // 2
+    
+    
+    
 
-    for rendered_text in rendered_lines:
-        text_rect = rendered_text.get_rect(centerx=rect.centerx, top=y_offset)
-        screen.blit(rendered_text, text_rect)
-        y_offset += text_rect.height
 
 GAME_PARAMETERS = {
     "genome_size": 10,
@@ -95,15 +86,6 @@ def settings_page(screen):
         display_parameters()
         # draw_buttons()
         pygame.display.flip()
-    
-def main():
-    pygame.init()
-    screen = pygame.display.set_mode((WIDTH + SIDEBAR_WIDTH, HEIGHT))
-    pygame.display.set_caption("Game of Life")
-    
-    settings_page(screen)
-    
-    #input screen
 
 
 def gameplay(screen, simulation: Simulation):
@@ -175,15 +157,61 @@ def gameplay(screen, simulation: Simulation):
         pygame.draw.rect(screen, (50, 50, 50), (WIDTH, 0, SIDEBAR_WIDTH, HEIGHT))
         
         # n_organisms = len(population.population)
-        render_wrapped_text(screen, "Press 'p' to pause/unpause", font, white, pygame.Rect(WIDTH, 100, 20, HEIGHT - 100))
-        render_wrapped_text(screen, f"Generation: {simulation.population.generation_count}", font, white, pygame.Rect(WIDTH, 100, 20, 20))
-        render_wrapped_text(screen, f"Information: \n{simulation.population.generation_data.get('selection_data', '')}", font, white, pygame.Rect(WIDTH, 100, 20, HEIGHT), max_lines=5)
+        
+        # Draw the sidebar
+        side_bar_texts = [
+            "Press 'f' to speed up the clock",
+            "Press 's' to slow down the clock",
+            "Press 'p' to pause/unpause",
+            '',
+            f"Generation: {simulation.population.generation_count}",
+            f"Information: \n{simulation.population.generation_data.get(str(simulation.population.generation_count))}"
+        ]
+        
+        y_offset = 0
+        for text in side_bar_texts:
+            render_wrapped_text(screen, text, font, white, WIDTH+100, y_offset, 200)
+            y_offset += 100
         
         pygame.display.flip()
         clock.tick(clock_speed)  # Limit the frame rate
 
     pygame.quit()
-    
-    
-if __name__ == '__main__':
-    main()
+
+def render_wrapped_text(screen, text, font, color, x, y, allowed_width):
+    # first, split the text into words
+    words = text.split()
+
+    # now, construct lines out of these words
+    lines = []
+    while len(words) > 0:
+        # get as many words as will fit within allowed_width
+        line_words = []
+        while len(words) > 0:
+            line_words.append(words.pop(0))
+            fw, fh = font.size(' '.join(line_words + words[:1]))
+            if fw > allowed_width:
+                break
+
+        # add a line consisting of those words
+        line = ' '.join(line_words)
+        lines.append(line)
+
+    # now we've split our text into lines that fit into the width, actually
+    # render them
+
+    # we'll render each line below the last, so we need to keep track of
+    # the culmative height of the lines we've rendered so far
+    y_offset = 0
+    for line in lines:
+        fw, fh = font.size(line)
+
+        # (tx, ty) is the top-left of the font surface
+        tx = x - fw / 2
+        ty = y + y_offset
+
+        font_surface = font.render(line, True, color)
+        screen.blit(font_surface, (tx, ty))
+
+        y_offset += fh
+

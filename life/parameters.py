@@ -14,7 +14,7 @@ class Parameters:
         population_size = POPULATION_SIZE,
         connection_magnitude = CONNECTION_MAGNITUDE,
         infection_step = INFECTION_STEP,
-        # mortality_step = MORTALITY_STEP,
+        mortality_rate = MORTALITY_RATE,
         infection_rate = INFECTION_RATE
         
     ):
@@ -28,7 +28,7 @@ class Parameters:
         self.population_size = population_size
         self.connection_magnitude = connection_magnitude
         self.infection_step = infection_step
-        # self.mortality_step = mortality_step
+        self.mortality_rate = mortality_rate
         self.infection_rate = infection_rate
         
         
