@@ -3,6 +3,7 @@ import copy
 import sys
 from simulation import Simulation
 from config import *
+from selection import ShapeSelector
 
 WIDTH, HEIGHT = 800, 800
 SIDEBAR_WIDTH = 200  # Width of the sidebar
@@ -86,8 +87,40 @@ def settings_page(screen):
         display_parameters()
         # draw_buttons()
         pygame.display.flip()
+        
+def shape_screen(screen, cell_size):
+    font = pygame.font.Font(None, 36)
+    selected_points = []
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+                
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+            
+                row = event.pos[1] // cell_size
+                col = event.pos[0] // cell_size
+                print((row, col))
+                selected_points.append((row, col))
+                    
+                if len(selected_points) == 4:
+                    # simulation.world.add_wall(x1, y1, x2, y2) #not adding walls here, put elsewhere!
+                    return selected_points
+        
+        screen.fill((0, 0, 0))
+        
+        render_wrapped_text(screen, 'Click 4 points to mark the boundaries of the zone', font, white, 0, 0, 200)
 
 
+def draw_polygon_alpha(surface, color, points, cell_size = 1):
+    ly, lx = zip(*points)
+    min_x, min_y, max_x, max_y = min(lx)*cell_size, min(ly)*cell_size, max(lx)*cell_size, max(ly)*cell_size
+    target_rect = pygame.Rect(min_x, min_y, max_x - min_x, max_y - min_y)
+    shape_surf = pygame.Surface(target_rect.size, pygame.SRCALPHA)
+    pygame.draw.polygon(shape_surf, color, [(x*cell_size - min_x, y*cell_size - min_y) for y,x in points])
+    surface.blit(shape_surf, target_rect)
+    
 def gameplay(screen, simulation: Simulation):
     font = pygame.font.Font(None, 36)
     ARRAY_SIZE = simulation.world.size
@@ -117,23 +150,13 @@ def gameplay(screen, simulation: Simulation):
                     print('Paused:', paused)
                 elif event.key == pygame.K_d:  # Enter drawing mode
                     drawing = not drawing
+                    selected_points = []
                     if drawing:
                         paused = True
-                        current_shape = []
                     else:
                         paused = False
             
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                if drawing:
-                    row = event.pos[1] // CELL_SIZE
-                    col = event.pos[0] // CELL_SIZE
-                    current_shape.append((row, col))
-
-            elif event.type == pygame.MOUSEBUTTONUP:
-                if drawing:
-                    captured_shape = copy.deepcopy(current_shape)
-                    current_shape = []
-                    print('Captured Shape:', captured_shape)
+            
 
         if not paused:
             simulation.step()
@@ -144,6 +167,7 @@ def gameplay(screen, simulation: Simulation):
         screen.fill((0, 0, 0))
 
         # Draw the array
+        
         for i in range(simulation.world.n_rows):
             for j in range(simulation.world.n_columns):
                 grid_item = simulation.world.grid[i][j]
@@ -152,9 +176,19 @@ def gameplay(screen, simulation: Simulation):
                 else:
                     color = grid_item.color
 
+                
+                # if isinstance(simulation.selector, ShapeSelector):
+                #     if simulation.selector.contains((j, i)):
+                #         print('inside')
+                #         pygame.draw.rect(screen, white, (j*CELL_SIZE, i*CELL_SIZE, CELL_SIZE, CELL_SIZE))
+                #     else:
+                #         pygame.draw.rect(screen, color, (j * CELL_SIZE, i * CELL_SIZE, CELL_SIZE, CELL_SIZE))
+                # else:
                 pygame.draw.rect(screen, color, (j * CELL_SIZE, i * CELL_SIZE, CELL_SIZE, CELL_SIZE))
 
         pygame.draw.rect(screen, (50, 50, 50), (WIDTH, 0, SIDEBAR_WIDTH, HEIGHT))
+        
+        draw_polygon_alpha(screen, (255, 255, 255, 100), simulation.selector.points, CELL_SIZE)
         
         # n_organisms = len(population.population)
         
@@ -214,4 +248,3 @@ def render_wrapped_text(screen, text, font, color, x, y, allowed_width):
         screen.blit(font_surface, (tx, ty))
 
         y_offset += fh
-

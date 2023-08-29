@@ -9,8 +9,8 @@ class Simulation:
         self.params = params
         
         self.world = world.World(params.world_size)
-        
-        self.selector = selection.SELECTOR_MAP[params.selector]()
+        print(params.selector_params)
+        self.selector = selection.SELECTOR_MAP[params.selector](*params.selector_params)
         
         self.population = population.Population(
             world = self.world, 
