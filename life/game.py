@@ -3,7 +3,6 @@ import copy
 import sys
 from simulation import Simulation
 from config import *
-from selection import ShapeSelector
 
 WIDTH, HEIGHT = 800, 800
 SIDEBAR_WIDTH = 200  # Width of the sidebar
@@ -92,6 +91,9 @@ def shape_screen(screen, cell_size):
     font = pygame.font.Font(None, 36)
     selected_points = []
     running = True
+    drawing_kill_zones = True
+    kill_zone_list = []
+    block_list = []
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -99,26 +101,57 @@ def shape_screen(screen, cell_size):
                 
             elif event.type == pygame.MOUSEBUTTONDOWN:
             
-                row = event.pos[1] // cell_size
-                col = event.pos[0] // cell_size
+                row = event.pos[0] // cell_size
+                col = event.pos[1] // cell_size
                 print((row, col))
                 selected_points.append((row, col))
-                    
-                if len(selected_points) == 4:
-                    # simulation.world.add_wall(x1, y1, x2, y2) #not adding walls here, put elsewhere!
-                    return selected_points
+
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    if drawing_kill_zones:
+                        kill_zone_list.append(selected_points)
+                        print(kill_zone_list)
+                        selected_points = []
+                    else:
+                        block_list.append(selected_points)
+                        print(block_list)
+                        selected_points = []
+                elif event.key == pygame.K_SPACE:
+                    drawing_kill_zones = not drawing_kill_zones
+                    selected_points = []
+                elif event.key == pygame.K_ESCAPE:
+                    return kill_zone_list, block_list
         
         screen.fill((0, 0, 0))
         
-        render_wrapped_text(screen, 'Click 4 points to mark the boundaries of the zone', font, white, 0, 0, 200)
+        for shape in kill_zone_list:
+            draw_polygon_alpha(screen, (233,30,30, 100), shape, cell_size)
+        for shape in block_list:
+            draw_polygon_alpha(screen, (127,127,127, 100), shape, cell_size)
+        
+        pygame.draw.rect(screen, (50, 50, 50), (WIDTH, 0, SIDEBAR_WIDTH, HEIGHT))
+        
+        side_bar_texts = [
+            'Drawing zones where organisms will die' if drawing_kill_zones else 'Drawing walls',
+            'Click to mark the boundaries of your shape. Press enter to save it',
+            'Make sure to click your points in a consistent order clock-wise or counter-clockwise'
+        ]
+        
+        y_offset = 0
+        for text in side_bar_texts:
+            render_wrapped_text(screen, text, font, white, WIDTH+100, y_offset, 200)
+            y_offset += 150
+        
+        pygame.display.flip()
+        
 
 
 def draw_polygon_alpha(surface, color, points, cell_size = 1):
-    ly, lx = zip(*points)
+    lx, ly = zip(*points)
     min_x, min_y, max_x, max_y = min(lx)*cell_size, min(ly)*cell_size, max(lx)*cell_size, max(ly)*cell_size
     target_rect = pygame.Rect(min_x, min_y, max_x - min_x, max_y - min_y)
     shape_surf = pygame.Surface(target_rect.size, pygame.SRCALPHA)
-    pygame.draw.polygon(shape_surf, color, [(x*cell_size - min_x, y*cell_size - min_y) for y,x in points])
+    pygame.draw.polygon(shape_surf, color, [(x*cell_size - min_x, y*cell_size - min_y) for x,y in points])
     surface.blit(shape_surf, target_rect)
     
 def gameplay(screen, simulation: Simulation):
@@ -155,6 +188,16 @@ def gameplay(screen, simulation: Simulation):
                         paused = True
                     else:
                         paused = False
+                        
+            elif (event.type == pygame.MOUSEBUTTONDOWN) & drawing:
+                row = event.pos[0] // CELL_SIZE
+                col = event.pos[1] // CELL_SIZE
+                selected_points.append((row, col))
+                
+                if len(selected_points) == 4:
+                    simulation.world.add_shape(selected_points)
+                    drawing = False
+                    paused = False
             
             
 
@@ -188,7 +231,9 @@ def gameplay(screen, simulation: Simulation):
 
         pygame.draw.rect(screen, (50, 50, 50), (WIDTH, 0, SIDEBAR_WIDTH, HEIGHT))
         
-        draw_polygon_alpha(screen, (255, 255, 255, 100), simulation.selector.points, CELL_SIZE)
+        
+        for points in simulation.selector.shapes:
+            draw_polygon_alpha(screen, (233,30,30, 100), points, CELL_SIZE)
         
         # n_organisms = len(population.population)
         

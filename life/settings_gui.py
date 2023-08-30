@@ -9,7 +9,7 @@ class ParameterEditor:
         self.root.title("Parameter Editor")
         
         self.parameters = {
-            "selector": tk.StringVar(value="shape"),
+            "selector": tk.StringVar(value="shapes"),
             "world_size": tk.IntVar(value=WORLD_SIZE),
             "genome_size": tk.IntVar(value=GENOME_SIZE),
             "n_internal_neurons": tk.IntVar(value=N_INTERNAL_NEURONS),
@@ -30,7 +30,7 @@ class ParameterEditor:
             label.grid(row=i, column=0, padx=10, pady=5, sticky="w")
             
             if isinstance(var, tk.StringVar):
-                options = ["shape", "disease"]
+                options = ["shapes", "disease"]
                 dropdown = ttk.Combobox(self.root, textvariable=var, values=options)
                 dropdown.grid(row=i, column=1, padx=10, pady=5, sticky="w")
             else:

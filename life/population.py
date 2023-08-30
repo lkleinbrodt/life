@@ -40,7 +40,7 @@ class Population:
             )
             self.population.append(organism)
             
-    def scatter(self):
+    def scatter(self, organisms = None):
         for organism in self.population:
             location = random.sample(range(self.world.size), 2)
             while self.world.is_occupied(location):

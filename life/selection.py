@@ -2,8 +2,8 @@
 from config import MORTALITY_RATE #TODO: use in params
 import random
 
-class ShapeSelector:
-    def __init__(self, *points: list):
+class ShapesSelector:
+    def __init__(self, *shapes: list):
                  
         # assert all([x >= 0 for x in [x1, x2, y1, y2]])
               
@@ -16,7 +16,7 @@ class ShapeSelector:
         #     y1 =  int(y1*n_rows)
         #     y2 = int(y2*n_rows)
         
-        self.points = points
+        self.shapes = shapes
     
     from population import Population
     
@@ -43,7 +43,10 @@ class ShapeSelector:
         return True
 
     def contains(self, loc):
-        return self._contains(loc, self.points) | self._contains(loc, list(reversed(self.points))) #TODO: IMPROVE
+        for points in self.shapes:
+            if self._contains(loc, points) | self._contains(loc, list(reversed(points))): #TODO: IMPROVE
+                return True
+        return False
             
         
         
@@ -90,6 +93,6 @@ class DiseaseSelector:
         return out
 
 SELECTOR_MAP = {
-    'shape': ShapeSelector,
+    'shapes': ShapesSelector,
     'disease': DiseaseSelector
 }

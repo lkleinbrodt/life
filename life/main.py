@@ -1,6 +1,5 @@
 from world import World
 from population import Population, load_population
-from selection import ShapeSelector, DiseaseSelector
 import game
 from config import *
 import pygame
@@ -39,18 +38,21 @@ if __name__ == '__main__':
         pygame.display.set_caption("Game of Life") 
         
         
-        if params.selector == 'shape':
+        if params.selector == 'shapes':
             screen = pygame.display.set_mode(
-                (game.WIDTH, #+ game.SIDEBAR_WIDTH, 
+                (game.WIDTH + game.SIDEBAR_WIDTH, 
                 game.HEIGHT)
             )
             cell_size = game.WIDTH // params.world_size
-            params.selector_params = game.shape_screen(screen, cell_size)
+            params.selector_params, block_list = game.shape_screen(screen, cell_size)
+            
         elif params.selector == 'disease':
+            block_list = []
             pass
             
         sim = simulation.Simulation(params)
-        
+        for block in block_list:
+            sim.world.add_shape(block)
         print(sim.population.directory)
         
         screen = pygame.display.set_mode(
